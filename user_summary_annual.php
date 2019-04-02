@@ -1,4 +1,4 @@
-<? include("header.php"); ?>
+<?php include("header.php"); ?>
 <script>
 	function RelaodPage(){
 		window.location.href = "user_summary_leave.php?year="+document.getElementById("year").value;
@@ -14,7 +14,7 @@
   -webkit-transform: scale(1); /* Safari and Chrome */
   -o-transform: scale(1); /* Opera */
   padding: 0px;
-}    
+}
 </style>
 <form name="form1" action="print_barcode.php" method="post" onsubmit="return doSubmit(this);" target="_blank">
   <input type="hidden" name="all_barocde" id="all_barocde" value=""  />
@@ -22,30 +22,30 @@
     <tr>
       <td colspan="2" align='left' valign='bottom' style='padding-left:30px; font-size:40px;'> สรุปวันลาพักร้อน</td>
     </tr>
-    <?  
-if($_SESSION[ss_user_id] != ""){
+    <?php
+if($_SESSION['ss_user_id'] != ""){
 $all_apporve_name[0] = "-";
 
-$sql = "select * from `user` where user_id != '' "; 
-if($_SESSION[ss_user_id] != ""){ $sql .= "  " ;}
-$res = mysql_query($sql);
-while($row = mysql_fetch_array($res)){
-	$all_user_id .= $row[user_id].",";
-	$all_apporve_name[$row[user_id]] = $row[name]." ".$row[sname];
-	$all_date_start[$row[user_id]] =  $row[date_start];
+$sql = "select * from `user` where user_id != '' ";
+if($_SESSION['ss_user_id'] != ""){ $sql .= "  " ;}
+$res = mysqli_query($_SESSION['connect'],$sql);
+while($row = mysqli_fetch_array($res,MYSQLI_ASSOC)){
+	$all_user_id .= $row['user_id'].",";
+	$all_apporve_name[$row['user_id']] = $row['name']." ".$row['sname'];
+	$all_date_start[$row['user_id']] =  $row['date_start'];
 }
 $all_user_id = substr($all_user_id,0,strlen($all_user_id)-1);
 // AND `dayleave_date` like '%$_REQUEST[year]%'
 $sql = "select * FROM  `dayleave_detail` where `leave_type` like  'annual'  AND user_id in ($_SESSION[ss_user_id])  Group By `dayleave_id`";
-$res = mysql_query($sql);
-while($row = mysql_fetch_array($res)){
-	$all_dayleave_id .= $row[dayleave_id].",";
+$res = mysqli_query($_SESSION['connect'],$sql);
+while($row = mysqli_fetch_array($res,MYSQLI_ASSOC)){
+	$all_dayleave_id .= $row['dayleave_id'].",";
 }
 $all_dayleave_id = substr($all_dayleave_id,0,strlen($all_dayleave_id)-1);
 
-$sql_query = "select * from `dayleave` where dayleave_id in ($all_dayleave_id) Order By user_id"; 
-$result = mysql_query($sql_query); 
-$num = mysql_num_rows($result);
+$sql_query = "select * from `dayleave` where dayleave_id in ($all_dayleave_id) Order By user_id";
+$result = mysqli_query($_SESSION['connect'],$sql_query);
+$num = mysqli_num_rows($result);
 
 $all_status["no"] = "<img src='prohibit.png' height=15  />";
 $all_status["reject"] = "<img src='trafficlight red.png' height=15  />";
@@ -72,7 +72,7 @@ $all_leave_type["other"] = "ลาอื่นๆ";
             </tr>
           </thead>
           <tbody>
-            <?
+            <?php
 $i = 1;
 $sum_leave = 0;
 
@@ -87,12 +87,12 @@ function check_in_range($start_date, $end_date, $date_from_user)
   return (($user_ts >= $start_ts) && ($user_ts <= $end_ts));
 }
 
-while($arr = mysql_fetch_array($result)){
+while($arr = mysqli_fetch_array($result,MYSQLI_BOTH)){
 if($tmp != $arr['user_id'] && $i > 1 ){
 ?>
             <tr>
               <td colspan="5" align="right"><em>สรุปวันลาที่อนุมัติ <? echo $all_apporve_name[$tmp]; ?></em></td>
-              <td align="right" ><? 
+              <td align="right" ><?php
 			if(floor(($sum_leave / 480 )) > 0){
 				echo floor(($sum_leave / 480 ))." วัน ";
 			}
@@ -109,19 +109,19 @@ if($tmp != $arr['user_id'] && $i > 1 ){
 			}
 			 ?></td>
               <td align="center">&nbsp;</td>
-              <td align="center"><div align=center><a onclick="show_detail(<? echo $arr[0] ?>);"></a></div></td>
+              <td align="center"><div align=center><a onclick="show_detail(<?php echo $arr[0] ?>);"></a></div></td>
             </tr>
             <tr>
               <td colspan="8" style="border-bottom:none;">&nbsp;</td>
             </tr>
-            <? 
+            <?php
 $sum_leave = 0;
 
 } ?>
             <tr>
-              <td><? echo $i; ?></td>
-              <td><? echo $all_leave_type[$arr['dayleave_type']]; ?></td>
-              <td align="center"><? 
+              <td><?php echo $i; ?></td>
+              <td><?php echo $all_leave_type[$arr['dayleave_type']]; ?></td>
+              <td align="center"><?php
 			if($arr['dayleave_status'] == 'no'){
 				echo $all_status[$arr['dayleave_status']];
 			}else{
@@ -131,32 +131,32 @@ $sum_leave = 0;
 					echo $all_status["reject"];
 				}
 			}
-			
+
 			 ?></td>
-              <td align="center"><? 
+              <td align="center"><?php
 				$ex  = explode(",",$arr['date_request']);
 				for($a=0;$a<count($ex);$a++){
 					echo date("d/m/",strtotime($ex[$a])).(date("y",strtotime($ex[$a]))+43)."<br>";
 				}
 		 ?></td>
-              <td align="center"><? if($arr['approved_user_id'] == 0){ echo "-"; }else{ 
+              <td align="center"><?php if($arr['approved_user_id'] == 0){ echo "-"; }else{
 				if($arr[date_apporve] != ""){
 					$ex  = explode(",",$arr['date_apporve']);
 					for($a=0;$a<count($ex);$a++){
 						echo date("d/m/",strtotime($ex[$a])).(date("y",strtotime($ex[$a]))+43)."<br>";
 						$all_date_app[] = $ex[$a];
-					} 
+					}
 				}else{
 					echo "-";
 				}
 				}?></td>
-              <td align="right" ><? 
-			//echo date("d/m/",strtotime($arr['datetime_entered'])).(date("y",strtotime($arr['datetime_entered']))+43); 
+              <td align="right" ><?php
+			//echo date("d/m/",strtotime($arr['datetime_entered'])).(date("y",strtotime($arr['datetime_entered']))+43);
 			if($arr[date_apporve] != ""){
-				$ex = explode(',' , $arr[date_request]); 
-				if($arr[dayleave_hour] != ""){ 
+				$ex = explode(',' , $arr[date_request]);
+				if($arr[dayleave_hour] != ""){
 					if($arr[dayleave_hour] < 8){
-						echo $arr[dayleave_hour]." ชม."; 
+						echo $arr[dayleave_hour]." ชม.";
 						$ex_hr = explode(":",$arr[dayleave_hour]);
 						$c_min = ($ex_hr[0] * 60);
 						$c_min += $ex_hr[1];
@@ -168,22 +168,22 @@ $sum_leave = 0;
 						$sum_leave += $c_min;
 						$sum_leave_t[$arr['dayleave_type']] += $c_min;
 					}
-				}else { 
+				}else {
 					echo count($ex)." วัน";
 					$c_min = (count($ex) * 8 * 60);
 					$sum_leave += $c_min;
 					$sum_leave_t[$arr['dayleave_type']] += $c_min;
-				} 
+				}
 			}else{
 				echo "-";
 			}
 			 ?></td>
-              <td align="center"><? echo $all_apporve_name[$arr['approved_user_id']]; ?></td>
+              <td align="center"><?php echo $all_apporve_name[$arr['approved_user_id']]; ?></td>
               <td align="center"><div align=center><a onclick="show_detail(<? echo $arr[0] ?>);"><img src='page.png' width='20' height="20"   /></a></div></td>
             </tr>
-            <? 
+            <?php
 		  $tmp = $arr['user_id'];
-		  $i++; 
+		  $i++;
  }
 
 
@@ -195,7 +195,7 @@ $sum_leave = 0;
         <img src="prohibit.png" height=15  /> รอพิจารณา <img src="trafficlight red.png" height=15  /> ไม่อนุมัติ <img src="trafficlight green.png" height=15  /> อนุมัติ <br /></td>
     </tr>
   </table>
-<?
+<?php
 $date1 = $all_date_start[$_SESSION['ss_user_id']];
 $date2 = date('Y-m-d');
 
@@ -249,23 +249,23 @@ $user_annual[30] = 15;
       </tr>
     </thead>
     <tbody>
-	<? 
+	<?php
 	$s_date = $all_date_start[$_SESSION['ss_user_id']];
-	
-	for($i = 1; $i<=ceil($diff / (365*60*60*24)); $i++){ 
-	
+
+	for($i = 1; $i<=ceil($diff / (365*60*60*24)); $i++){
+
 		$newEndingDate = date("Y-m-d", strtotime(date("Y-m-d", strtotime($s_date)) . " + 1 year"));
 	?>
       <tr>
-        <td><? echo $i; ?></td>
-        <td><? 
+        <td><?php echo $i; ?></td>
+        <td><?php
 		echo date("d/m/",strtotime($s_date)).(date("y",strtotime($s_date))+43);
 		echo " - ";
-		$ee = date("Y-m-d", strtotime(date("Y-m-d", strtotime($newEndingDate)) . " - 1 day")); 
+		$ee = date("Y-m-d", strtotime(date("Y-m-d", strtotime($newEndingDate)) . " - 1 day"));
 		echo date("d/m/",strtotime($ee)).(date("y",strtotime($ee))+43);
 		?></td>
-        <td align="center"><? echo $user_annual[$i]; ?></td>
-        <td align="center"><?
+        <td align="center"><?php echo $user_annual[$i]; ?></td>
+        <td align="center"><?php
 			$c = 0;
 			for($b=0;$b<count($all_date_app);$b++){
 				if(check_in_range($s_date, $ee, $all_date_app[$b])){
@@ -274,9 +274,9 @@ $user_annual[30] = 15;
 			}
 			echo $c;
 		?></td>
-        <td align="center"><? echo  $user_annual[$i] - $c; ?></td>
+        <td align="center"><?php echo  $user_annual[$i] - $c; ?></td>
       </tr>
-	 <? 
+	 <?php
 	 	$s_date = $newEndingDate;
 	 } ?>
     </tbody>
@@ -284,7 +284,7 @@ $user_annual[30] = 15;
   <tbody>
 </form>
 <script>
-	function createAjax() 
+	function createAjax()
 	{
 		var request = false;
 			try {
@@ -298,7 +298,7 @@ $user_annual[30] = 15;
 			try {
 				request = new XMLHttpRequest();
 			}
-			catch (err1) 
+			catch (err1)
 			{
 				request = false;
 			}
@@ -311,8 +311,8 @@ $user_annual[30] = 15;
 			scroll(0,0);
 			var url = "";
 			url =  "dayleave_id="+dayleave_id;
-	
-			var ajax1=createAjax(); 
+
+			var ajax1=createAjax();
 			ajax1.onreadystatechange=function(){
 				//alert(ajax1.responseText);
 				if(ajax1.readyState==4 && ajax1.status==200){
@@ -321,7 +321,7 @@ $user_annual[30] = 15;
 				}
 			}
 			ajax1.open("POST","ajax_leave_detail.php",true);
-			ajax1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); 
+			ajax1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 			ajax1.send(url);
 
 	}
@@ -332,4 +332,4 @@ $user_annual[30] = 15;
 		location.href = "report_leave.php?leave_type="+document.getElementById("leave_type").value+"&company_id="+document.getElementById("company_id").value+"&branch_id="+document.getElementById("branch_id").value+"&department_id="+document.getElementById("department_id").value+"&fromdate="+document.getElementById("fromdate").value;
 	}
 </script>
-<? include("footer.php"); ?>
+<?php include("footer.php"); ?>

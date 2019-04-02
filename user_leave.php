@@ -1,9 +1,17 @@
-<? include("header.php"); 
-if($_GET[leave_type] == "9B59B6" ||  $_GET[leave_type] == "2ECC71" || $_GET[leave_type] == "" ){
-	$lock_yesterday = 0;
-}else{
-	$lock_yesterday = 1;
+<?php
+include("header.php");
+if (!isset($_GET['leave_type'])) {
+	// code...
+		$lock_yesterday = 0;
 }
+else{
+	if($_GET['leave_type'] == "9B59B6" ||  $_GET['leave_type'] == "2ECC71" || $_GET['leave_type'] == "" ){
+		$lock_yesterday = 0;
+	}else{
+		$lock_yesterday = 1;
+	}
+}
+
 $lock_yesterday = 0;
 ?>
 <form action="user_leave_doadd.php" method="post" id="form1" enctype="multipart/form-data">
@@ -12,15 +20,15 @@ $lock_yesterday = 0;
       <td align='left' style='padding-left:25px; font-size:40px;' valign='bottom'><table width="80%" border="0" cellspacing="0" cellpadding="0" align="center">
           <tr>
             <td valign="bottom" ><select id="leave_type" name="leave_type" style="width:130px;  border-radius: 3px; height:45px; margin-bottom:0px; margin-top:0px; font-family: 'psl_kittithadaspregular'; font-size:30px;" onchange="changeURL()">
-                <option value="2ECC71" <? if($_GET[leave_type] == "2ECC71"){?> selected="selected" <? }?>>ลากิจ</option>
-                <option value="9B59B6" <? if($_GET[leave_type] == "9B59B6"){?> selected="selected" <? }?>>ลาป่วย</option>
-                <option value="F1C40F" <? if($_GET[leave_type] == "F1C40F"){?> selected="selected" <? }?>>ลาพักร้อน</option>
-                <option value="E67E22" <? if($_GET[leave_type] == "E67E22"){?> selected="selected" <? }?>>ลาอื่นๆ</option>
+                <option value="2ECC71" <?php if($_GET['leave_type'] == "2ECC71"){?> selected="selected" <?php }?>>ลากิจ</option>
+                <option value="9B59B6" <?php if($_GET['leave_type'] == "9B59B6"){?> selected="selected" <?php }?>>ลาป่วย</option>
+                <option value="F1C40F" <?php if($_GET['leave_type'] == "F1C40F"){?> selected="selected" <?php }?>>ลาพักร้อน</option>
+                <option value="E67E22" <?php if($_GET['leave_type'] == "E67E22"){?> selected="selected" <?php }?>>ลาอื่นๆ</option>
               </select>
-			 
+
               <select  id="time_start"  name="time_start" style="width:130px; border-radius: 3px; height:45px; margin-bottom:0px; margin-top:0px; font-family: 'psl_kittithadaspregular'; font-size:30px;" >
                 <option value="0">เวลาเริ่มลา</option>
-                <? 
+                <?php
                     for($i=8;$i<18;$i++){
 						for($ii=0;$ii<2;$ii++){
 							$print = 1;
@@ -44,7 +52,7 @@ $lock_yesterday = 0;
               </select>
               <select id="time_end" name="time_end"  style="width:130px; border-radius: 3px; height:45px; margin-bottom:0px; margin-top:0px; font-family: 'psl_kittithadaspregular'; font-size:30px;" >
                 <option value="0">จำนวน</option>
-                <? 
+                <?php
 					for($i=0;$i<9;$i++){
 						if($i != 0){
 						echo "<option value=".$i.">".$i." ชม</option>";
@@ -59,8 +67,8 @@ $lock_yesterday = 0;
         </table></td>
       <td align='right' style='padding-right:30px;'><a class='button large orange' style='text-align:center; height:30px; font-size:30px;' onClick="doSubmit();"><strong>ขออนุมัติลางาน</strong></a></td>
     </tr>
-    <? 
-  
+    <?php
+
 
 $monthNames[0]    =    'มกราคม';
 $monthNames[1]    =    'กุมภาพันธ์';
@@ -76,7 +84,7 @@ $monthNames[10]    =    'พฤศจิกายน';
 $monthNames[11]    =    'ธันวาคม';
 if (!isset($_GET["m"])) $_GET["m"] = date("n");
 if (!isset($_GET["y"])) $_GET["y"] = date("Y");
- 
+
 $currentMonth = $_GET["m"];
 $currentYear = $_GET["y"];
 
@@ -86,35 +94,35 @@ $all_color["annual"] = "#F1C40F";
 $all_color["other"] = "#E67E22";
 
 $sql = "SELECT * FROM `dayleave_detail` WHERE `user_id` = '$_SESSION[ss_user_id]' AND status != 'reject' AND MONTH(  `dayleave_date` ) = $currentMonth AND YEAR(  `dayleave_date` ) = $currentYear ";
-$res = mysql_query($sql);
-while($row = mysql_fetch_array($res)){
-	$all_day_leave[] = date("j",strtotime($row[dayleave_date])); 
-	$all_color_leave[date("j",strtotime($row[dayleave_date]))] = $all_color[$row[leave_type]]; 
-	$all_status_leave[date("j",strtotime($row[dayleave_date]))] = $row[status]; 
+$res = $_SESSION['connect']->query($sql);
+while($row = $res->fetch_array(MYSQLI_ASSOC)){
+	$all_day_leave[] = date("j",strtotime($row['dayleave_date']));
+	$all_color_leave[date("j",strtotime($row['dayleave_date']))] = $all_color[$row['leave_type']];
+	$all_status_leave[date("j",strtotime($row['dayleave_date']))] = $row['status'];
 }
 
 $sql = "SELECT * FROM `user` WHERE `user_id` = '$_SESSION[ss_user_id]' ";
-$res = mysql_query($sql);
-$row = mysql_fetch_array($res);
+$res = $_SESSION['connect']->query($sql);
+$row = $res->fetch_array(MYSQLI_ASSOC);
 $dayoff_id = $row['dayoff_id'];
 $approve_user_id = $row["leave_apporve_id"];
 
 $sql = "SELECT * FROM `dayoff_detail` WHERE `dayoff_detail_month` = $currentMonth AND `dayoff_detail_year` = $currentYear AND `dayoff_id` = '$dayoff_id'";
-$res = mysql_query($sql);
-$row = mysql_fetch_array($res);
-$all_dayoff = explode(",",$row[dayoff_detail_day]);
-  
-  
+$res = $_SESSION['connect']->query($sql);
+$row = $res->fetch_array(MYSQLI_ASSOC);
+$all_dayoff = explode(",",$row['dayoff_detail_day']);
+
+
 $p_year = $currentYear;
 $n_year = $currentYear;
 $p_month = $currentMonth-1;
 $n_month = $currentMonth+1;
- 
+
 if ($p_month == 0 ) {
     $p_month = 12;
     $p_year = $currentYear - 1;
 }
- 
+
 if ($n_month == 13 ) {
     $n_month = 1;
 
@@ -151,20 +159,20 @@ $monthNames[10]    =    'พฤศจิกายน';
 $monthNames[11]    =    'ธันวาคม';
 if (!isset($_GET["m"])) $_GET["m"] = date("n");
 if (!isset($_GET["y"])) $_GET["y"] = date("Y");
- 
+
 $currentMonth = $_GET["m"];
 $currentYear = $_GET["y"];
- 
+
 $p_year = $currentYear;
 $n_year = $currentYear;
 $p_month = $currentMonth-1;
 $n_month = $currentMonth+1;
- 
+
 if ($p_month == 0 ) {
     $p_month = 12;
     $p_year = $currentYear - 1;
 }
- 
+
 if ($n_month == 13 ) {
     $n_month = 1;
 
@@ -176,13 +184,13 @@ $maxday = date("t",$timestamp);
 $thismonth = getdate ($timestamp);
 $startday = $thismonth['wday'];
 for ($i=0; $i<($maxday+$startday); $i++) {
-    if(($i % 7) == 0 ){ 
+    if(($i % 7) == 0 ){
 		echo "<tr>";
-		$ii = 0; 
+		$ii = 0;
 	}
 	$ii++;
-    if($i < $startday){ 
-		echo "<td class=nono>&nbsp;</td>"; 
+    if($i < $startday){
+		echo "<td class=nono>&nbsp;</td>";
 	} else {
 		 $thisday = mktime(0,0,0,$currentMonth,($i - $startday + 1),$currentYear);
 		 echo "<td style=' border-radius:0px; ";
@@ -200,12 +208,12 @@ for ($i=0; $i<($maxday+$startday); $i++) {
 			 }else{
 					echo "Onclick=add('".$currentYear."-".$currentMonth."-". ($i - $startday + 1) . "'); id='td_".$currentYear."-".$currentMonth."-". ($i - $startday + 1) . "'><input type='checkbox' name='datepicked[]'   style='display:none;' value='". ($i - $startday + 1) . "' id='".$currentYear."-".$currentMonth."-". ($i - $startday + 1) . "'";
 			 }
-			 
+
 		 }else{
-		 	echo  " background-color:grey'; ";	
+		 	echo  " background-color:grey'; ";
 			echo "' ";
 		 }
-		 
+
 		 if(in_array(($i - $startday + 1),$all_day_leave)){
 		 	if($all_status_leave[($i - $startday + 1)] == "wait"){
 		 		echo  "  ><img src='Users-Conference-icon.png' height='40' /></td>";
@@ -217,7 +225,7 @@ for ($i=0; $i<($maxday+$startday); $i++) {
 		 }
 		 // echo  "  >".($i - $startday + 1) . "</td>";
 	}
-    if(($i % 7) == 6 ){ 
+    if(($i % 7) == 6 ){
 		echo "</tr>";
 	}
 	if($i == (($maxday+$startday)-1)){
@@ -257,9 +265,9 @@ function add(date){
     for(i=0;i<len;i++) {
          if(chk[i].checked) {
             has_program = true;
-			chk2++; 
-            //break;    
-          } 
+			chk2++;
+            //break;
+          }
     }
 	if(chk2 > 1){
 		document.getElementById("time_start").disabled=true;
@@ -275,7 +283,7 @@ function add(date){
 	}
 }
 function doSubmit(){
-	
+
 	var chk = document.getElementsByName('datepicked[]');
     var len = chk.length;
     var has_program = false;
@@ -286,8 +294,8 @@ function doSubmit(){
             has_program = true;
 			chk2++;
 			day_detail += chk[i].value+" <? echo $monthNames[$currentMonth-1];?> <? echo ($currentYear+543); ?><br>";
-            //break;    
-          } 
+            //break;
+          }
     }
 	var show_sum = "show";
 	if(chk2 == 0){
@@ -337,7 +345,7 @@ function doSubmit(){
 		}else if(chk2 > 1){
 			day_hour_txt = chk2+" วัน ";
 		}
-		
+
 		document.getElementById("leave_type_txt").innerHTML = leave_type_txt;
 		document.getElementById("time_txt").innerHTML =  time_str_txt;
 		document.getElementById("sum_txt").innerHTML =  day_hour_txt;
@@ -346,7 +354,7 @@ function doSubmit(){
 		document.getElementById("file_txt").innerHTML =  document.getElementById("file_attach").value;
 		document.getElementById("shadow1").style.visibility = 'visible';
 	}
-	
+
 }
 function doCancelConfirm() {
 	document.getElementById("shadow1").style.visibility = 'hidden';
@@ -363,7 +371,7 @@ function doConfirm() {
 			}
 		}
 		if(lock_yesterday == 1){
-			if(document.getElementById("leave_type").value == "9B59B6"){ 
+			if(document.getElementById("leave_type").value == "9B59B6"){
 				location.href = "user_leave.php?leave_type=9B59B6&m=<? echo $currentMonth; ?>&y=<? echo $currentYear; ?>";
 			}
 		}*/
@@ -372,4 +380,4 @@ function doConfirm() {
 	}
 </script>
 
-<? include("footer.php"); ?>
+<?php include("footer.php"); ?>

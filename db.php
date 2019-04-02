@@ -1,11 +1,15 @@
-<?
+<?php
 	session_start();
 	$dbhost = "localhost";
 	$dbuser = "root";
-	$dbpasswd = "5555";
+	$dbpasswd = "";
 	$dbname = "pongcool_ps";
-	$conn  = mysql_pconnect($dbhost, $dbuser, $dbpasswd) or die("Could not connect database : Please Connect Internet " . mysql_error());	
-	mysql_select_db($dbname, $conn) or die("Could not select database : ".mysql_error());
-	
-	mysql_query("SET NAMES UTF8");
+	$conn  = new mysqli($dbhost, $dbuser, $dbpasswd,$dbname);
+//or die("Could not connect database : Please Connect Internet " . mysqli_error());
+	//mysql_select_db($dbname, $conn) or die("Could not select database : ".mysql_error());
+
+	$_SESSION['connect'] = $conn;
+
+
+	mysqli_set_charset($conn,"utf8");
 ?>

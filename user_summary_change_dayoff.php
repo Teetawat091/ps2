@@ -1,4 +1,4 @@
-<? include("header.php"); ?>
+<?php include("header.php"); ?>
 <script>
 	function RelaodPage(){
 		window.location.href = "user_summary_leave.php?year="+document.getElementById("year").value;
@@ -22,21 +22,21 @@
     <td colspan="2" align='left' valign='bottom' style='padding-left:30px; font-size:40px;'>
       สรุปการเปลี่ยนวันหยุด</td>
     </tr>
-  <?  
-if($_SESSION[ss_user_id] != ""){
+  <?php
+if($_SESSION['ss_user_id'] != ""){
 $all_apporve_name[0] = "-";
 
-$sql = "select * from `user` where user_id != '' "; 
-if($_SESSION[ss_user_id] != ""){ $sql .= "  " ;}
-$res = mysql_query($sql);
-while($row = mysql_fetch_array($res)){
-	$all_user_id .= $row[user_id].",";
-	$all_apporve_name[$row[user_id]] = $row[name]." ".$row[sname];
+$sql = "select * from `user` where user_id != '' ";
+if($_SESSION['ss_user_id'] != ""){ $sql .= "  " ;}
+$res = mysqli_query($_SESSION['connect'],$sql);
+while($row = mysqli_fetch_array($res,MYSQLI_BOTH)){
+	$all_user_id .= $row['user_id'].",";
+	$all_apporve_name[$row['user_id']] = $row['name']." ".$row['sname'];
 }
 
-$sql_query = "select * from `dayoff_change` where user_id = '$_SESSION[ss_user_id]' Order By user_id"; 
-$result = mysql_query($sql_query); 
-$num = mysql_num_rows($result);
+$sql_query = "select * from `dayoff_change` where user_id = '$_SESSION[ss_user_id]' Order By user_id";
+$result = $_SESSION['connect']->query($sql_query);
+$num = mysqli_num_rows($result);
 
 $all_status["no"] = "<img src='prohibit.png' height=15  />";
 $all_status["reject"] = "<img src='trafficlight red.png' height=15  />";
@@ -56,39 +56,39 @@ $all_status["approve"] = "<img src='trafficlight green.png'  height=15  />";
             </tr>
         </thead>
         <tbody>
-          <?
+          <?php
 $i = 1;
 $sum_leave = 0;
-while($arr = mysql_fetch_array($result)){
+while($arr = mysqli_fetch_array($result,MYSQLI_BOTH)){
 if($tmp != $arr['user_id'] && $i > 1 ){
 ?>
 		  <tr><td colspan="6" style="border-bottom:none;">&nbsp;</td>
 		    </tr>
-<? 
+<?php
 $sum_leave = 0;
 
 } ?>
           <tr>
-            <td><? echo $i; ?></td>
-            <td align="center"><? 
+            <td><?php echo $i; ?></td>
+            <td align="center"><?php
 					echo date("d / m / ",strtotime($arr[old_dayoff])).(date("Y",strtotime($arr[old_dayoff]))+543)."<br>";
 		 ?></td>
-            <td align="center"><? 					
+            <td align="center"><?php
 					echo date("d / m / ",strtotime($arr[new_dayoff])).(date("Y",strtotime($arr[new_dayoff]))+543)."<br>";
 			?></td>
-			<td align="center" ><? echo $arr['dayoff_change_remark']; ?></td>
-			<td align="center" ><? 
+			<td align="center" ><?php echo $arr['dayoff_change_remark']; ?></td>
+			<td align="center" ><?php
 				echo $all_status[$arr['dayoff_change_status']];
 			 ?></td>
-            <td align="center"><? echo $all_apporve_name[$arr['approved_user_id']]; ?></td>
+            <td align="center"><?php echo $all_apporve_name[$arr['approved_user_id']]; ?></td>
             </tr>
-          <? 
+          <?
 		  $tmp = $arr['user_id'];
-		  $i++; 
+		  $i++;
  }
  if( $tmp != "" ){
 ?>
-<? }
+<?php }
 
 }
 
@@ -97,15 +97,15 @@ $sum_leave = 0;
       </table>
       <br />
 		<img src="prohibit.png" height=15  /> รอพิจารณา
-	  	<img src="trafficlight red.png" height=15  />  ไม่อนุมัติ 
+	  	<img src="trafficlight red.png" height=15  />  ไม่อนุมัติ
 		<img src="trafficlight green.png" height=15  />  อนุมัติ
-	  
+
 	  <br /></td>
   </tr>
 </table>
 </form>
 <script>
-	function createAjax() 
+	function createAjax()
 	{
 		var request = false;
 			try {
@@ -119,7 +119,7 @@ $sum_leave = 0;
 			try {
 				request = new XMLHttpRequest();
 			}
-			catch (err1) 
+			catch (err1)
 			{
 				request = false;
 			}
@@ -132,8 +132,8 @@ $sum_leave = 0;
 			scroll(0,0);
 			var url = "";
 			url =  "dayleave_id="+dayleave_id;
-	
-			var ajax1=createAjax(); 
+
+			var ajax1=createAjax();
 			ajax1.onreadystatechange=function(){
 				//alert(ajax1.responseText);
 				if(ajax1.readyState==4 && ajax1.status==200){
@@ -142,7 +142,7 @@ $sum_leave = 0;
 				}
 			}
 			ajax1.open("POST","ajax_leave_detail.php",true);
-			ajax1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded"); 
+			ajax1.setRequestHeader("Content-Type", "application/x-www-form-urlencoded");
 			ajax1.send(url);
 
 	}
@@ -154,4 +154,4 @@ $sum_leave = 0;
 	}
 </script>
 
-<? include("footer.php"); ?>
+<?php include("footer.php"); ?>

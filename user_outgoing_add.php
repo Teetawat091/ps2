@@ -1,4 +1,4 @@
-<? include('header.php'); //echo phpversion();?>
+<?php include('header.php'); //echo phpversion();?>
 <html>
 <style type="text/css">
 html,body{
@@ -7,10 +7,10 @@ html,body{
 
 }
 	#php{
-		background-color:  #DDDDDD;	
+		background-color:  #DDDDDD;
 		height: 100%;
 		font-size: 14px;
-		
+
 
 	}
 	button,input[type = submit]{
@@ -45,7 +45,7 @@ function curl_get_contents($url)
   return $data;
 }
 
-//echo $_POST['realstart'];
+echo $_POST['realstart'];
 $slat = explode(",",$_POST['realstart']);
 $slat[0] = substr($slat[0],9);// ของเก่า7
 $slat[1] = substr($slat[1],8);// ของเก่า6
@@ -56,7 +56,7 @@ $slat[1] = substr($slat[1],0,strlen($slat[1])-1);
 $url = "https://maps.googleapis.com/maps/api/distancematrix/json?units=imperial&origins=".$slat[0].",".$slat[1]."&destinations=".$_POST['en']."&key=AIzaSyBHlC_bwi0D_b86YE0ZN1hnymItuDb_5N0";
 //echo $url;
 $originsstatus;// 0 ไม่มีการเปลี่ยนจุดเริ่มต้น 1 ไม่ได้เริ่มต้นจากสำนักงาน
-$json = json_decode(curl_get_contents($url)); 
+$json = json_decode(curl_get_contents($url));
 //$json = file_get_contents($url);
 //print_r($json);
 $data = json_encode($json);
@@ -70,7 +70,7 @@ $dest = $data['destination_addresses'][0];
 $origin = $data['origin_addresses'][0];
 $dest_description;
 $uid = $_POST['uid'];
-    
+
 if(isset($dest)==false){
 	$dest_description = 1;
 
@@ -96,7 +96,7 @@ $stepurl = 'https://maps.googleapis.com/maps/api/directions/json?origin='.$slat[
 
 //echo $stepurl;
 
-$jsonsteps = json_decode(curl_get_contents($stepurl)); 
+$jsonsteps = json_decode(curl_get_contents($stepurl));
 $stepdata = json_encode($jsonsteps);
 $data = json_decode($stepdata,TRUE);
 
@@ -123,7 +123,7 @@ for($i=0;$i<$countstep;$i++){
 	$eachendlat[$i] = $steps[$i]['end_location']['lat'];
 	$eachendlng[$i] = $steps[$i]['end_location']['lng'];
 	$eachaction[$i] = strip_tags($eachaction[$i]);
-	
+
 }
 
 echo '<br>'."Distance : ".$distance." km";
@@ -146,50 +146,50 @@ else {
 
 	echo 'Cost : '.$distance*$rate ." bath".'<br>'.'<br>';
 	echo "<input type='hidden' value = '".$distance*$rate."' name = 'cost'>";
-	
+
 	$newdbsql = " INSERT INTO `user_outgoing` (`user_outgoing_id`, `branch_id`, `user_id`, `origin_lat`, `origin_lng`, `origin_branch_description_id`, `destination_lat`, `destination_lng`, `destination_branch_description_id`, `vihecle_type`, `distance`, `rate`, `cost`, `status`, `datetime_enter`, `description`) VALUES (NULL,".$_POST['cam'].",".$uid.", '".$slat[0]."', '".$slat[1]."','".$originsstatus."', '".$endpos[0]."', '".$endpos[1]."', '".$dest_description."', '".$_POST['select']."', ".$distance.", ".$rate.", ".$distance*$rate.",'wait' ,'".$datetime."','".$_POST['descriptions']."')";
 //echo $newdbsql;
-	if (mysql_query($newdbsql)) {
+	if (mysqli_query($_SESSION['connect'],$newdbsql)) {
 		//echo "add to db complete".'<br>';
-  
+
     }
  else {
-    echo "Error: " . $newdbsql . "<br>" . mysql_error($conn);
+    echo "Error: " . $newdbsql . "<br>" . mysqli_error($conn);
 }
 
 $ogid;
 $foridsql = "SELECT user_outgoing_id FROM user_outgoing WHERE datetime_enter = '".$datetime."'";
 //echo $foridsql;
-$result = mysql_query($foridsql);
+$result = mysqli_query($_SESSION['connect'],$foridsql);
 if($result){
-	 while ($arec= mysql_fetch_array($result)){
+	 while ($arec= mysqli_fetch_array($result,MYSQLI_ASSOC)){
 	 	//echo  "Outgoing id : ".$arec['user_outgoing_id']."<br>";
 	 	$ogid=$arec['user_outgoing_id'];
 	 }
-	
+
 }
 //echo $ogid;
 
 for($i=0;$i<$countstep;$i++){
 	$sqlstep = "INSERT INTO `user_outgoing_detail`(user_outgoing_detail_id,user_outgoing_id,start_lat,start_lng,end_lat,end_lng,distance,instruction) VALUES (NULL,'".$ogid."','".$eachstartlat[$i]."','".$eachstartlng[$i]."','".$eachendlat[$i]."','".$eachendlng[$i]."','".$eachdistance[$i]."','".$eachaction[$i]."')";
 	 $sqlstep;
-	if(mysql_query($sqlstep)){
+	if(mysqli_query($_SESSION['connect'],$sqlstep)){
 		//echo "complete";
 	}
 	else{
 		echo "<br>"."fail";
 	}
 }
-    
+
     $position;
     $bossmail;
     $bossid;
     $encodebossmail;
     $positionsql = "SELECT position_id,leave_apporve_id FROM user WHERE user_id=".$_SESSION[ss_user_id];
     //echo $positionsql;
-    $pos = mysql_query($positionsql);
+    $pos = mysqli_query($_SESSION['connect'],$positionsql);
     if($pos){
-    	while ($poss = mysql_fetch_array($pos)) {
+    	while ($poss = mysqli_fetch_array($pos,MYSQLI_ASSOC)) {
     		$position = $poss['position_id'];
     		$bossid = $poss['leave_apporve_id'];
     	}
@@ -200,7 +200,7 @@ for($i=0;$i<$countstep;$i++){
 
     //print_r($bossid);
     $bossid = str_replace("[", "", $bossid);
-    $bossid = str_replace("]", "", $bossid);				
+    $bossid = str_replace("]", "", $bossid);
     //var_dump($bossid);
     if(strpos($bossid, ",")!==false){
     	$bossid = explode(",", $bossid);
@@ -209,28 +209,28 @@ for($i=0;$i<$countstep;$i++){
     		//echo $bossid[$i].'<br>';
     		$bossmailsql = "SELECT email FROM user WHERE user.user_id =".$bossid[$i];
     		//echo $bossmailsql;
-    		$bossmailresult =  mysql_query($bossmailsql);
+    		$bossmailresult =  mysqli_query($_SESSION['connect'],$bossmailsql);
     		if($bossmailresult){
-        		while ($mailres= mysql_fetch_array($bossmailresult)){
+        		while ($mailres= mysqli_fetch_array($bossmailresult,MYSQLI_ASSOC)){
 	 			$bossmail[$i]=$mailres['email'];
 	 			//echo $bossmail[$i];
 	 }
     }
     	}
-    	
+
     }
     else{
     	for($i=0;$i<count($bossid);$i++){
     	//echo $bossid;
     	$bossmailsql = "SELECT email FROM user WHERE user.user_id =".$bossid;
     	//echo $bossmailsql;
-    	$bossmailresult =  mysql_query($bossmailsql);
+    	$bossmailresult =  mysqli_query($_SESSION['connect'],$bossmailsql);
     	if($bossmailresult){
-        	while ($mailres= mysql_fetch_array($bossmailresult)){	
+        	while ($mailres= mysqli_fetch_array($bossmailresult,MYSQLI_ASSOC)){
 	 		$bossmail[$i]=$mailres['email'];
 	 	}
     }
-    
+
     }
 }
    /*echo '<pre>';
@@ -239,7 +239,7 @@ for($i=0;$i<$countstep;$i++){
     $encodebossmail = json_encode($bossmail);
     	//echo $encodebossmail;
 	}
-mysql_close($conn);
+mysqli_close($conn);
 ?>
 <a class="orange large button" href="#" onclick="document.getElementById('sendmail').submit()" style="font-size:40px;"><strong>ส่งเมล</strong></a>
 <?
@@ -255,7 +255,7 @@ mysql_close($conn);
 
 </form>
 
-</div>	
+</div>
 </div>
 </body>
 <script type="text/javascript">
@@ -265,6 +265,6 @@ mysql_close($conn);
 	console.log(document.getElementById('description').value);
 	document.getElementById('boss').value = bmail;
 	console.log(document.getElementById('boss').value);
-	
+
 </script>
 </html>

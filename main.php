@@ -1,4 +1,4 @@
-<? include("header.php"); ?>
+<?php include("header.php"); ?>
 <table border="0" width="65%" cellspacing="0" cellpadding="0" align="center" class="bordered" style="margin-top:100px;">
   <tr>
     <td rowspan="3" width="150" align="center"><img src="man-24-512.png" width="100" /></td>
@@ -14,5 +14,4 @@
       น.</td>
   </tr>
 </table>
-<? include("footer.php"); ?>
-
+<?php include("footer.php"); ?>

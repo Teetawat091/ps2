@@ -1,4 +1,4 @@
-<?
+<?php
 	include("db.php");
 	if($_SESSION['ss_user_id'] == ""){
 		exit();
@@ -11,15 +11,15 @@
 	$sql = "select *  FROM  `dayleave_detail` WHERE  `dayleave_date` <  '$sql_3hour' AND `status` = 'wait' AND `leave_type` != 'sick'  AND `leave_type` != 'personal'  GROUP BY `dayleave_id`";
 	$res = mysql_query($sql);
 	while($row = mysql_fetch_array($res)){
-	
+
 		$sql_l_detail = "select * from `dayleave` Where `dayleave_id` = $row[dayleave_id]  ";
 		$res_l_detail = mysql_query($sql_l_detail);
 		$row_l_detial = mysql_fetch_array($res_l_detail);
 		$all_day_request = $row_l_detial[date_request];
-		
+
 		$sql_detail = "Update `dayleave` SET  `dayleave_status` = 'yes' , `date_reject` = '$all_day_request', `approved_user_id` = '0' , `approved_datetime` = NOW() Where `dayleave_id` = $row_l_detial[dayleave_id]";
 		mysql_query($sql_detail);
-		
+
 		$sql_detail = "Update `dayleave_detail` Set `status` = 'reject' , `approved_user_id` = '0' , `approved_datetime` =  NOW() Where `dayleave_id` = $row_l_detial[dayleave_id]";
 		mysql_query($sql_detail);
 	}*/
@@ -56,7 +56,7 @@ a{
 color:#000000;
 }
 a:hover
-{ 
+{
 color: #f89d1b;
 }
 
@@ -73,7 +73,7 @@ body {
 	width:980px;
 
 background-color: #df6105;
-	
+
 }
 #header{
 text-align:center;
@@ -117,7 +117,7 @@ text-align:center;
 	height: 40px;
 	width:196px;
 	text-align:center;
-	
+
 }
 
 /* Links */
@@ -128,7 +128,7 @@ text-align:center;
 	margin: 8px 0;
 	line-height: 28px;
 	text-decoration: none;
-	
+
 	border-left: 1px solid #393942;
 	border-right: 1px solid #4f5058;
 	font-family:'psl_kittithadaspregular',Sans-Serif;
@@ -148,7 +148,7 @@ text-align:center;
 .menu li:first-child a { border-left: none; }
 .menu li:last-child a{ border-right: none; }
 
-.menu li:hover > a { 
+.menu li:hover > a {
 /*color: #7c51a0; */
 color: #f89d1b;
 }
@@ -161,7 +161,7 @@ color: #f89d1b;
 	left: 0;
 
 	opacity: 0;
-	
+
 	background: #1f2024;
 
 	-webkit-border-radius: 0 0 5px 5px;
@@ -216,8 +216,8 @@ font-size:27px;
     -moz-border-radius: 6px;
     -webkit-border-radius: 6px;
     border-radius: 6px;
-    -webkit-box-shadow: 0 1px 1px #ccc; 
-    -moz-box-shadow: 0 1px 1px #ccc; 
+    -webkit-box-shadow: 0 1px 1px #ccc;
+    -moz-box-shadow: 0 1px 1px #ccc;
     box-shadow: 0 1px 1px #ccc;
 	background:#FFF;
 	font-size:30px;
@@ -233,7 +233,7 @@ font-size:27px;
   -webkit-transform: scale(2); /* Safari and Chrome */
   -o-transform: scale(2); /* Opera */
   padding: 0px;
-}    
+}
 .bordered td, .bordered th {
     padding: 5px;
 }
@@ -246,11 +246,11 @@ font-size:27px;
     background-image:     -ms-linear-gradient(top, #ebf3fc, #dce9f9);
     background-image:      -o-linear-gradient(top, #ebf3fc, #dce9f9);
     background-image:         linear-gradient(top, #ebf3fc, #dce9f9);
-    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset; 
-    -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;  
-    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;        
+    -webkit-box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
+    -moz-box-shadow:0 1px 0 rgba(255,255,255,.8) inset;
+    box-shadow: 0 1px 0 rgba(255,255,255,.8) inset;
     border-top: none;
-    text-shadow: 0 1px 0 rgba(255,255,255,.5); 
+    text-shadow: 0 1px 0 rgba(255,255,255,.5);
 }
 
 .bordered td:first-child, .bordered th:first-child {
@@ -294,16 +294,16 @@ font-size:27px;
     display: inline-block;
     position: relative;
     overflow: visible;
-    
+
     width: auto;
     padding: 5px 15px 6px;
     border-bottom: 1px solid rgba(0,0,0,0.25);
-    
+
     background: #222;
     color: #fff !important;
     line-height: 1;
     text-decoration: none;
-    
+
     -webkit-border-radius: 5px;
        -moz-border-radius: 5px;
             border-radius: 5px;
@@ -311,7 +311,7 @@ font-size:27px;
        -moz-box-shadow: 0 1px 3px rgba(0,0,0,0.25);
             box-shadow: 0 1px 3px rgba(0,0,0,0.25);
     text-shadow: 0 -1px 1px rgba(0,0,0,0.25);
-    
+
     cursor: pointer;
   }
     .button:hover {
@@ -405,7 +405,7 @@ font-size:27px;
         color: #444 !important;
         border-color: #999;
       }
-	  
+
 #hor-minimalist-b
 {
 font-family:"Times New Roman", Times, serif;
@@ -516,8 +516,8 @@ td.nono:hover {
 </style>
 <script language="javascript" type="text/javascript">
 	  document.oncontextmenu=RightMouseDown;
-	  document.onmousedown = mouseDown; 
-	
+	  document.onmousedown = mouseDown;
+
 	  function mouseDown(e) {
 		  if (e.which==3 ||e.which==2) {//righClick
 		  //alert("Disabled - do whatever you like here..");
@@ -597,11 +597,11 @@ td.nono:hover {
 	  <li><a href="user_summary_annual.php">สรุปวันลาพักร้อน</a></li>
 	  <li><a href="user_summary_change_dayoff.php">สรุปการเปลี่ยนวันหยุด</a></li>
 	  <li><a href="outgoing_summary.php">สรุปออกนอกสถานที่</a></li>
-	  
+
     </ul>
   </li>
 
-  <? if($_SESSION['ss_user_level'] == 'admin' ){ ?>
+  <?php if($_SESSION['ss_user_level'] == 'admin' ){ ?>
   <li > <a href="#">งานบุคคล</a>
     <ul  >
       <li ><a href="company.php">ข้อมูลบริษัท</a></li>
@@ -625,12 +625,12 @@ td.nono:hover {
         <li><a href="#">ข้อมูลทรัพย์สิน</a></li>-->
     </ul>
   </li>
-  <? } ?>
-  <? if($_SESSION['ss_user_level'] == 'admin_branch' ){ ?>
+<?php } ?>
+  <?php if($_SESSION['ss_user_level'] == 'admin_branch' ){ ?>
   <li ><a href="dayoff.php">ข้อมูลชุดวันหยุด</a>
   </li>
-    <? } ?>
-  <? if($_SESSION['ss_user_level'] == 'manager' || $_SESSION['ss_user_level'] == 'admin' ){ ?>
+<?php } ?>
+  <?php if($_SESSION['ss_user_level'] == 'manager' || $_SESSION['ss_user_level'] == 'admin' ){ ?>
   <li> <a  href="#">อนุมัติคำขอ</a>
     <ul>
       <li><a href="apporve_summary_leave.php">อนุมัติคำขอลางาน</a></li>
@@ -641,7 +641,7 @@ td.nono:hover {
       <li><a href="#">รายงาน</a></li>-->
     </ul>
   </li>
-  <? } ?>
+<?php } ?>
     <li> <a href="#">ทั่วไป</a>
     <ul>
       <li><a href="it_job_add.php">แจ้งซ่อมงานไอที</a></li>

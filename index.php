@@ -1,16 +1,16 @@
-<?
+<?php
 
 	if($_POST['username'] && $_POST['password']){
 		include("db.php");
 		$username = $_POST['username'];
 		$password  = $_POST['password'];
 		$sql = "Select * FROM  `user` where `username`= '$username'  AND `password` = PASSWORD(  '$password' )  ";
-		$result = mysql_query($sql);
-		$num = mysql_num_rows($result);
+		$result = mysqli_query($_SESSION['connect'],$sql);
+		$num = mysqli_num_rows($result);
 		if($num == 0){
 			$error = "Username , Password ไม่ถูกต้อง";
 		}else{
-			$row = mysql_fetch_array($result);
+			$row = mysqli_fetch_array($result,MYSQLI_ASSOC);
 			$_SESSION[ss_user_id] =  $row['user_id'];
 			$_SESSION[ss_username] =  $row['username'];
 			$_SESSION[ss_user_code] =  $row['user_code'];
@@ -20,24 +20,24 @@
 			$_SESSION[ss_sname] =  $row['sname'];
 			$_SESSION[ss_position_id] =  $row['position_id'];
 			$_SESSION[ss_branch_id] =  $row['branch_id'];
-			
+
 			$sql = "INSERT INTO `user_login_log` (`id` ,`user_id` ,`ip` ,`datetime_entered`)VALUES (NULL ,  '$_SESSION[ss_user_id]',  '$_SERVER[REMOTE_ADDR]', NOW());";
-			mysql_query($sql);
-			
+			mysqli_query($_SESSION['connect'],$sql);
+
 			$sql = "SELECT * FROM `user_login_log` Where user_id = '$_SESSION[ss_user_id]' Order By id DESC Limit 1,1 ";
-			$res = mysql_query($sql);
-			$row = mysql_fetch_array($res);
+			$res = mysqli_query($_SESSION['connect'],$sql);
+			$row = mysqli_fetch_array($res,MYSQLI_ASSOC);
 			$_SESSION[last_login] = $row['datetime_entered'];
-			
+
 			$sql = "SELECT * FROM `position` Where position_id = '$_SESSION[ss_position_id]' ";
-			$res = mysql_query($sql);
-			$row = mysql_fetch_array($res);
+			$res = mysqli_query($_SESSION['connect'],$sql);
+			$row = mysqli_fetch_array($res,MYSQLI_ASSOC);
 			$_SESSION[ss_position] = $row['position_name'];
 			echo $_SESSION[ss_position];
-			
+
 			echo '<meta http-equiv="refresh" content="0; url=main.php">';
 			exit;
-				
+
 		}
 	}elseif($_POST['logincheck']){
 		$error = "กรุุณาตรวจสอบ Username Password";
@@ -71,8 +71,8 @@
 	</style>
 <script language="javascript" type="text/javascript">
 	  document.oncontextmenu=RightMouseDown;
-	  document.onmousedown = mouseDown; 
-	
+	  document.onmousedown = mouseDown;
+
 	  function mouseDown(e) {
 		  if (e.which==3 ||e.which==2) {//righClick
 		  //alert("Disabled - do whatever you like here..");
@@ -87,7 +87,7 @@ function checklogin(f){
 		{f.submit();
 	}
 	else alert(" : : กรุณาใส่ชื่อผู้ใช้และรหัสผ่านค่ะ : : ");
-	
+
 }
 -->
 </SCRIPT>
@@ -118,7 +118,7 @@ function checklogin(f){
   </tr>
   <tr >
     <td colspan="3" align="center"><br /><strong><span style="font-size:40px; color:#FF0000;"><? echo $error; ?></span></strong>
-      
+
     </td>
   </tr></table>
 </form>

@@ -1,4 +1,4 @@
-<? include("header.php"); ?>
+<?php include("header.php"); ?>
 <script>
 	function doSubmit(){
 		if(document.getElementById("new_password").value == "" || document.getElementById("new_password2").value == "" ){
@@ -36,4 +36,4 @@
     </tr>
   </table>
 </form>
-<? include("footer.php"); ?>
+<?php include("footer.php"); ?>
